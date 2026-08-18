@@ -9,7 +9,7 @@
 [![Report](https://img.shields.io/badge/Report-Mochawesome-FF6B6B?style=flat-square)](https://github.com/adamgruber/mochawesome)
 [![Pages](https://img.shields.io/badge/Pages-GitHub%20Pages-222222?style=flat-square&logo=github)](https://pages.github.com/)
 
-Framework de automatización web con Cypress y TypeScript para [SauceDemo](https://www.saucedemo.com).
+Framework de automatización web con Cypress y TypeScript para [SauceDemo](https://www.saucedemo.com). Implementa Page Object Model, custom commands, tests de accesibilidad con axe-core y reportes HTML con Mochawesome.
 
 ## Reporte de Pruebas
 
@@ -68,7 +68,6 @@ npm install
 | `npm run format` | Formatea código con Prettier |
 | `npm run format:check` | Verifica formateo con Prettier |
 | `npm run report:generate` | Genera reporte HTML completo |
-| `npm run allure:open` | Abre reporte Allure |
 
 ## Estructura del proyecto
 
@@ -115,6 +114,7 @@ npm install
 - `clickLogin()` - Hacer clic en login
 - `login(username, password)` - Login completo
 - `getErrorMessage()` - Obtener mensaje de error
+- `isErrorDisplayed()` - Verificar si se muestra error
 
 ### InventoryPage
 - `isInventoryDisplayed()` - Verificar si se muestra el inventario
@@ -122,6 +122,7 @@ npm install
 - `getItemNames()` - Obtener nombres de productos
 - `getItemPrices()` - Obtener precios de productos
 - `addToCart(index)` - Agregar producto al carrito
+- `removeFromCart(index)` - Eliminar producto del carrito
 - `goToCart()` - Ir al carrito
 - `getCartBadgeCount()` - Obtener contador del carrito
 - `sortBy(option)` - Ordenar productos
@@ -129,6 +130,7 @@ npm install
 ### CartPage
 - `isCartDisplayed()` - Verificar si se muestra el carrito
 - `getItemCount()` - Obtener cantidad de items
+- `getItemNames()` - Obtener nombres de items
 - `removeItem(index)` - Eliminar item del carrito
 - `checkout()` - Ir al checkout
 - `continueShopping()` - Volver a comprar
@@ -139,47 +141,62 @@ npm install
 - `finishCheckout()` - Finalizar compra
 - `cancelCheckout()` - Cancelar compra
 - `getCompleteMessage()` - Obtener mensaje de confirmación
+- `backToProducts()` - Volver a productos
 
 ## Custom Commands
 
 - `cy.login(username, password)` - Login en SauceDemo
 - `cy.loginAsStandardUser()` - Login como usuario estándar
 - `cy.loginAsProblemUser()` - Login como usuario problemático
+- `cy.loginAsLockedOutUser()` - Login como usuario bloqueado
 - `cy.addToCart(index)` - Agregar producto al carrito
 - `cy.goToCart()` - Ir al carrito
-- `cy.getByDataTest(selector)` - Seleccionar por data-test
+- `cy.getByDataTest(selector)` - Seleccionar por data-test attribute
 
-## Tests incluidos
+## Tests incluidos (29)
 
-### Login
+### Login (5)
 - Login exitoso
 - Error con usuario bloqueado
 - Error con credenciales inválidas
-- Error con campos vacíos
+- Error con contraseña vacía
+- Error con usuario vacío
 
-### Inventario
-- Mostrar productos
-- Agregar productos al carrito
-- Ordenar productos
+### Inventario (8)
+- Mostrar todos los productos
+- Mostrar nombres de productos
+- Mostrar precios de productos
+- Agregar producto al carrito
+- Agregar múltiples productos
+- Ordenar precio bajo-alto
+- Ordenar precio alto-bajo
+- Ordenar nombre A-Z
 
-### Carrito
-- Agregar/eliminar productos
-- Navegación
+### Carrito (5)
+- Agregar producto y ver en carrito
+- Agregar múltiples productos
+- Eliminar producto del carrito
+- Continuar comprando
+- Mostrar nombre del producto en carrito
 
-### Checkout
-- Completar compra
+### Checkout (6)
+- Completar compra exitosamente
 - Cancelar compra
-- Validaciones de campos
+- Error nombre faltante
+- Error apellido faltante
+- Error código postal faltante
+- Volver a productos después de compra
 
-### Accesibilidad (axe-core)
-- Violaciones de accesibilidad
-- Navegación por teclado
-- Atributos ARIA
+### Accesibilidad - axe-core (5)
+- Violaciones de accesibilidad (critical/serious)
+- Elementos de formulario enfocables
+- Visibilidad de mensajes de error
 - Jerarquía de encabezados
+- Nombres accesibles en botones y campos
 
 ## Website Under Test
 
-[SauceDemo](https://www.saucedemo.com) - Tienda de demostración para testing.
+[SauceDemo](https://www.saucedemo.com) - Tienda de demostración para testing automatizado.
 
 ## Tecnologías
 
@@ -189,7 +206,6 @@ npm install
 - Page Object Model
 - GitHub Actions (CI/CD)
 - ESLint + Prettier (Code Quality)
-- axe-core (Accessibility Testing)
+- axe-core / cypress-axe (Accessibility Testing)
 - Mochawesome (HTML Reports)
-- Allure (Advanced Reports)
 - GitHub Pages (Report Deployment)
