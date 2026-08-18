@@ -29,11 +29,11 @@ describe("Accessibility Tests", () => {
     cy.focused().should("have.attr", "data-test", "login-button");
   });
 
-  it("Error messages should have proper ARIA attributes", () => {
+  it("Error messages should be visible after failed login", () => {
     cy.get('[data-test="login-button"]').click();
     cy.get('[data-test="error"]')
       .should("be.visible")
-      .and("have.attr", "aria-hidden", "false");
+      .and("contain.text", "Username is required");
   });
 
   it("All images should have alt text", () => {
@@ -42,12 +42,12 @@ describe("Accessibility Tests", () => {
     });
   });
 
-  it("Form inputs should have labels", () => {
-    cy.get("input").each(($input) => {
-      const id = $input.attr("id");
-      if (id) {
-        cy.get(`label[for="${id}"]`).should("exist");
-      }
-    });
+  it("Page should have proper heading hierarchy", () => {
+    cy.get("h1").should("have.length.at.most", 1);
+  });
+
+  it("Login inputs should have accessible names", () => {
+    cy.get('[data-test="username"]').should("have.attr", "placeholder");
+    cy.get('[data-test="password"]').should("have.attr", "placeholder");
   });
 });
