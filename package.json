@@ -13,8 +13,6 @@
     "test:dev": "cypress run --config-file cypress.config.ts --env configFile=dev",
     "test:staging": "cypress run --config-file cypress.config.ts --env configFile=staging",
     "test:prod": "cypress run --config-file cypress.config.ts --env configFile=prod",
-    "allure:open": "allure open allure-results",
-    "allure:serve": "allure serve allure-results",
     "lint": "eslint cypress/ --ext .ts",
     "lint:fix": "eslint cypress/ --ext .ts --fix",
     "format": "prettier --write 'cypress/**/*.ts'",
