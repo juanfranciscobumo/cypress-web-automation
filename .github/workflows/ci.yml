@@ -1,0 +1,139 @@
+name: Cypress Web Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20]
+        browser: [chrome, firefox]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run E2E tests
+        run: npm run cypress:run -- --browser ${{ matrix.browser }}
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-results-${{ matrix.browser }}-node-${{ matrix.node-version }}
+          path: |
+            cypress/screenshots
+            cypress/videos
+          retention-days: 7
+
+  report:
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all test results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: cypress-results-*
+          path: all-results
+          merge-multiple: true
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Generate Report
+        run: |
+          mkdir -p report
+          cat > report/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="es">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Cypress Web Test Report</title>
+            <style>
+              * { margin: 0; padding: 0; box-sizing: border-box; }
+              body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+              .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+              .header { text-align: center; margin-bottom: 3rem; }
+              .header h1 { font-size: 2.5rem; background: linear-gradient(135deg, #10b981, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+              .header p { color: #94a3b8; margin-top: 0.5rem; }
+              .card { background: #1e293b; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; border: 1px solid #334155; }
+              .card h2 { color: #34d399; margin-bottom: 1rem; }
+              .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; }
+              .badge-success { background: #065f46; color: #6ee7b7; }
+              .badge-info { background: #1e3a5f; color: #93c5fd; }
+              a { color: #60a5fa; text-decoration: none; }
+              a:hover { text-decoration: underline; }
+              .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem; }
+              .grid-item { background: #0f172a; border-radius: 8px; padding: 1rem; border: 1px solid #334155; }
+              .grid-item h3 { color: #60a5fa; font-size: 1rem; margin-bottom: 0.5rem; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h1>Cypress Web Test Report</h1>
+                <p>Automatización web con Cypress y TypeScript - SauceDemo</p>
+              </div>
+              <div class="card">
+                <h2>Información del Reporte</h2>
+                <p><strong>Fecha:</strong> $(date +'%Y-%m-%d %H:%M:%S UTC')</p>
+                <p><strong>Branch:</strong> ${{ github.ref_name }}</p>
+                <p><strong>Commit:</strong> <a href="https://github.com/${{ github.repository }}/commit/${{ github.sha }}">${{ github.sha }}</a></p>
+                <span class="badge badge-success">Tests Web Ejecutados</span>
+              </div>
+              <div class="card">
+                <h2>Navegadores Probados</h2>
+                <div class="grid">
+                  <div class="grid-item"><h3>Google Chrome</h3><p>E2E Tests completados</p></div>
+                  <div class="grid-item"><h3>Mozilla Firefox</h3><p>E2E Tests completados</p></div>
+                </div>
+              </div>
+              <div class="card">
+                <h2>Artefactos de Prueba</h2>
+                <p>Los screenshots y videos de las pruebas están disponibles como artefactos en la ejecución del workflow.</p>
+                <p><a href="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}">Ver ejecución completa</a></p>
+              </div>
+            </div>
+          </body>
+          </html>
+          EOF
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: report
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
