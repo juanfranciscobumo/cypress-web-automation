@@ -10,12 +10,15 @@
     "report:html": "marge cypress/reports/merged-report.json --reportDir cypress/reports/html --overwrite",
     "report:generate": "npm run cypress:run && npm run report:merge && npm run report:html",
     "test:accessibility": "cypress run --spec 'cypress/e2e/tests/accessibility.cy.ts'",
+    "allure:open": "allure open allure-results",
+    "allure:serve": "allure serve allure-results",
     "lint": "eslint cypress/ --ext .ts",
     "lint:fix": "eslint cypress/ --ext .ts --fix",
     "format": "prettier --write 'cypress/**/*.ts'",
     "format:check": "prettier --check 'cypress/**/*.ts'"
   },
   "devDependencies": {
+    "@shelex/cypress-allure-plugin": "^2.41.2",
     "@types/node": "^20.0.0",
     "@typescript-eslint/eslint-plugin": "^8.67.0",
     "@typescript-eslint/parser": "^8.67.0",

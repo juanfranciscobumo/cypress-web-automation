@@ -18,4 +18,8 @@ export default defineConfig({
       json: true,
     },
   },
+  env: {
+    allure: true,
+    allureLogAsserts: true,
+  },
 });
