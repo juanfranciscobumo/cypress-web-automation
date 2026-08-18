@@ -73,7 +73,7 @@ jobs:
       - name: Generate Report
         run: |
           mkdir -p report
-          cat > report/index.html << 'EOF'
+          cat > report/index.html << EOF
           <!DOCTYPE html>
           <html lang="es">
           <head>
