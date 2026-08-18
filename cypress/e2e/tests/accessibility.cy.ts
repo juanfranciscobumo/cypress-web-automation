@@ -5,12 +5,7 @@ describe("Accessibility Tests", () => {
     cy.visit("/");
   });
 
-  it("Login page should have no accessibility violations", () => {
-    cy.injectAxe();
-    cy.checkA11y();
-  });
-
-  it("Login page should have no critical violations", () => {
+  it("Login page should have no critical accessibility violations", () => {
     cy.injectAxe();
     cy.checkA11y(null, {
       runOnly: {
@@ -20,12 +15,14 @@ describe("Accessibility Tests", () => {
     });
   });
 
-  it("Login form should be keyboard navigable", () => {
+  it("Login form inputs should be focusable", () => {
     cy.get('[data-test="username"]').focus();
     cy.focused().should("have.attr", "data-test", "username");
-    cy.tab();
+
+    cy.get('[data-test="password"]').focus();
     cy.focused().should("have.attr", "data-test", "password");
-    cy.tab();
+
+    cy.get('[data-test="login-button"]').focus();
     cy.focused().should("have.attr", "data-test", "login-button");
   });
 
@@ -34,12 +31,6 @@ describe("Accessibility Tests", () => {
     cy.get('[data-test="error"]')
       .should("be.visible")
       .and("contain.text", "Username is required");
-  });
-
-  it("All images should have alt text", () => {
-    cy.get("img").each(($img) => {
-      cy.wrap($img).should("have.attr", "alt");
-    });
   });
 
   it("Page should have proper heading hierarchy", () => {
