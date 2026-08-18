@@ -16,17 +16,23 @@ export class InventoryPage {
   }
 
   getItemNames(): Cypress.Chainable<string[]> {
-    return cy.get(this.itemName).invoke("text").then((text) => text.split("\n"));
+    const names: string[] = [];
+    return cy
+      .get(this.itemName)
+      .each(($el) => {
+        names.push($el.text());
+      })
+      .then(() => names);
   }
 
   getItemPrices(): Cypress.Chainable<number[]> {
-    return cy.get(this.itemPrice)
-      .invoke("text")
-      .then((texts) => {
-        return texts
-          .split("\n")
-          .map((t: string) => parseFloat(t.replace("$", "")));
-      });
+    const prices: number[] = [];
+    return cy
+      .get(this.itemPrice)
+      .each(($el) => {
+        prices.push(parseFloat($el.text().replace("$", "")));
+      })
+      .then(() => prices);
   }
 
   addToCart(index: number): void {

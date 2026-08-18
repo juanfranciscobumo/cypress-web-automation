@@ -44,7 +44,7 @@ describe("Checkout Tests", () => {
     checkoutPage.enterFirstName("Juan");
     checkoutPage.enterLastName("Perez");
     checkoutPage.continueToOverview();
-    cy.get('[data-test="error"]').should("contain", "Zip/Postal Code is required");
+    cy.get('[data-test="error"]').should("contain", "Postal Code is required");
   });
 
   it("debería volver a productos después de completar compra", () => {
