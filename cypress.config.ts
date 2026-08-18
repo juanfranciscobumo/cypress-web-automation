@@ -1,4 +1,5 @@
 import { defineConfig } from "cypress";
+import allureWriter from "@shelex/cypress-allure-plugin";
 
 export default defineConfig({
   e2e: {
@@ -16,6 +17,10 @@ export default defineConfig({
       overwrite: false,
       html: true,
       json: true,
+    },
+    setupNodeEvents(on, config) {
+      allureWriter(on, config);
+      return config;
     },
   },
   env: {
